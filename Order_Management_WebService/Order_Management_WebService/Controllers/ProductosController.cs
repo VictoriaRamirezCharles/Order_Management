@@ -17,10 +17,28 @@ namespace Order_Management_WebService.Controllers
         [Route("get-all")]
         public IHttpActionResult GetallProducts()
         {
-            return Response(() =>
+            return Response((WebResponse res) =>
             {
                 var data = _Business.Productos.GetAll();
-                return data;
+                if (data.Count != 0)
+                {
+                    res.Code = WebResponse.ResponseCode.success;
+                    res.Message = new WebResponse.ResponseMessage
+                    {
+                        Title = "Success",
+                        Body = "Success"
+                    };
+                }
+                else
+                {
+                    res.Code = WebResponse.ResponseCode.warning;
+                    res.Message = new WebResponse.ResponseMessage
+                    {
+                        Title = "Warning",
+                        Body = $"There is no data"
+                    };
+                }
+                return res;
             });
         }
 
@@ -28,10 +46,29 @@ namespace Order_Management_WebService.Controllers
         [Route("get-by-id/{id}")]
         public IHttpActionResult GetProductById(int id)
         {
-            return Response(() =>
+           
+            return Response((WebResponse res) =>
             {
                 var data = _Business.Productos.GetById(id);
-                return data;
+                if (data != null)
+                {
+                    res.Code = WebResponse.ResponseCode.success;
+                    res.Message = new WebResponse.ResponseMessage
+                    {
+                        Title = "Success",
+                        Body = "Success"
+                    };
+                }
+                else
+                {
+                    res.Code = WebResponse.ResponseCode.warning;
+                    res.Message = new WebResponse.ResponseMessage
+                    {
+                        Title = "Warning",
+                        Body = $"There is no data"
+                    };
+                }
+                return res;
             });
         }
 
@@ -51,6 +88,7 @@ namespace Order_Management_WebService.Controllers
                         Title = "Success",
                         Body = "The product has been added successfully."
                     };
+                    res.Data = response;
                 }
                 else
                 {

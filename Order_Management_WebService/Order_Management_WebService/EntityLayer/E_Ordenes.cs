@@ -12,10 +12,6 @@ namespace Order_Management_WebService.EntityLayer
     {
         [Column("IDORDEN"),Key]
         public int IdOrden { get; set; }
-
-        [Column("CODIGO")]
-        public string Codigo { get; set; }
-
         [Column("FECHAORDEN")]
         public DateTime Fecha { get; set; }
     }

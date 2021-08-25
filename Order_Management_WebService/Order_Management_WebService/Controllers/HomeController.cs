@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +12,7 @@ namespace Order_Management_WebService.Controllers
         // GET: Home
         public ActionResult Index()
         {
+            
             return View();
         }
     }

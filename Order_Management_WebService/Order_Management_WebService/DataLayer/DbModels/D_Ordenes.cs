@@ -69,7 +69,6 @@ namespace Order_Management_WebService.DataLayer.DbModels
                           select new
                           {
                               Id = o.IdOrden,
-                              Codigo = o.Codigo,
                               Fecha = o.Fecha,
                               Precio = od.Precio,
                               Cantidad = od.Cantidad,
@@ -82,7 +81,6 @@ namespace Order_Management_WebService.DataLayer.DbModels
             var listOrdenes = result.Select(x => new OrdenesDtoModel
             {
                 IdOrden = x.Id,
-                Codigo = x.Codigo,
                 Fecha = x.Fecha,
                 Precio = x.Precio,
                 Cantidad = x.Cantidad,
@@ -106,7 +104,6 @@ namespace Order_Management_WebService.DataLayer.DbModels
                           select new
                           {
                               Id = o.IdOrden,
-                              Codigo = o.Codigo,
                               Fecha = o.Fecha,
                               Precio = od.Precio,
                               Cantidad = od.Cantidad,
@@ -119,7 +116,6 @@ namespace Order_Management_WebService.DataLayer.DbModels
             var listOrdenes = result.Select(x => new OrdenesDtoModel
             {
                 IdOrden = x.Id,
-                Codigo = x.Codigo,
                 Fecha = x.Fecha,
                 Precio = x.Precio,
                 Cantidad = x.Cantidad,

@@ -13,9 +13,6 @@ namespace Order_Management_WebService.EntityLayer
         [Column("IDPRODUCTO"), Key]
         public int IdProducto { get; set; }
 
-        [Column("CODIGO")]
-        public string Codigo { get; set; }
-
         [Column("NOMBRE")]
         public string Nombre { get; set; }
 
