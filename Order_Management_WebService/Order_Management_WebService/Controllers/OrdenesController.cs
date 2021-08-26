@@ -40,42 +40,31 @@ namespace Order_Management_WebService.Controllers
         {
             return Response((WebResponse res) =>
             {
-                var orden = new E_Ordenes();
-                orden.Fecha = DateTime.Now;
-                var response = _Business.Ordenes.Add(orden);
-
-                if (response != null)
+                try
                 {
+                    var orden = new E_Ordenes();
+                    orden.Fecha = DateTime.Now;
+                    _Business.Ordenes.Add(orden);
+
                     var oDetalle = new E_Ordenes_Detalle
                     {
-                        IdOrden = response.IdOrden,
+                        IdOrden = model.Id,
                         Precio = model.Precio,
                         Cantidad = model.Cantidad,
                         IdProducto = model.IdProducto
-                        
+
                     };
-                    var orden_detalle = _Business.Ordenes_Detalle.Add(oDetalle);
-                    if (orden_detalle != null)
+
+                    _Business.Ordenes_Detalle.Add(oDetalle);
+
+                    res.Code = WebResponse.ResponseCode.success;
+                    res.Message = new WebResponse.ResponseMessage
                     {
-                        res.Code = WebResponse.ResponseCode.success;
-                        res.Message = new WebResponse.ResponseMessage
-                        {
-                            Title = "Success",
-                            Body = "The order has been added successfully."
-                        };
-                    }
-                    else
-                    {
-                        res.Code = WebResponse.ResponseCode.error;
-                        res.Message = new WebResponse.ResponseMessage
-                        {
-                            Title = "Error",
-                            Body = $"There is an error."
-                        };
-                    }
-                
+                        Title = "Success",
+                        Body = "The order has been added successfully."
+                    };
                 }
-                else
+                catch(Exception ex)
                 {
                     res.Code = WebResponse.ResponseCode.error;
                     res.Message = new WebResponse.ResponseMessage
@@ -84,7 +73,7 @@ namespace Order_Management_WebService.Controllers
                         Body = $"There is an error."
                     };
                 }
-
+                
                 return res;
             });
         }

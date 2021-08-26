@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Order_Management_WebService.BusinessLayer.Models
 {
-    public class B_Asignaciones : ISelect<E_Asignaciones>, IInsert<E_Asignaciones>, IDelete<E_Asignaciones>, IUpdate<E_Asignaciones>
+    public class B_Asignaciones : ISelect<E_Asignaciones>, IDelete<E_Asignaciones>, IUpdate<E_Asignaciones>
     {
         private D_Asignaciones _context;
 
@@ -16,18 +16,23 @@ namespace Order_Management_WebService.BusinessLayer.Models
         {
             _context = new D_Asignaciones();
         }
-        public E_Asignaciones Add(E_Asignaciones data)
+        public void Add(E_Asignaciones data)
         {
-            var asignaciones = _context.Add(data);
-            return asignaciones;
+            _context.Add(data);
+          
         }
 
         public bool DeleteById(int id)
         {
-
-            var result = _context.DeleteById(id);
-            return result;
-
+            try
+            {
+                _context.DeleteById(id);
+                return true;
+            }
+            catch( Exception ex)
+            {
+                return false;
+            }
         }
 
         public List<E_Asignaciones> GetAll()

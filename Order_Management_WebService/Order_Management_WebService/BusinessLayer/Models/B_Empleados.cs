@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Order_Management_WebService.BusinessLayer.Models
 {
-    public class B_Empleados : ISelect<E_Empleados>, IInsert<E_Empleados>, IDelete<E_Empleados>, IUpdate<E_Empleados>
+    public class B_Empleados : ISelect<E_Empleados>, IDelete<E_Empleados>, IUpdate<E_Empleados>
     {
         private D_Empleados _context;
 
@@ -16,17 +16,25 @@ namespace Order_Management_WebService.BusinessLayer.Models
         {
             _context = new D_Empleados();
         }
-        public E_Empleados Add(E_Empleados data)
+        public void Add(E_Empleados data)
         {
-            var empleado = _context.Add(data);
-            return empleado;
+           _context.Add(data);
+           
         }
 
         public bool DeleteById(int id)
         {
 
-            var result = _context.DeleteById(id);
-            return result;
+            try
+            {
+                _context.DeleteById(id);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
 
         }
 

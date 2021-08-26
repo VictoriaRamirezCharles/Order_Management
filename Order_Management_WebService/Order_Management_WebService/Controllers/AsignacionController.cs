@@ -39,10 +39,9 @@ namespace Order_Management_WebService.Controllers
         {
             return Response((WebResponse res) =>
             {
-                var response = _Business.Asignaciones.Add(model);
-
-                if (response != null)
+                try
                 {
+                    _Business.Asignaciones.Add(model);
                     res.Code = WebResponse.ResponseCode.success;
                     res.Message = new WebResponse.ResponseMessage
                     {
@@ -50,7 +49,7 @@ namespace Order_Management_WebService.Controllers
                         Body = "The asignation has been added successfully."
                     };
                 }
-                else
+                catch(Exception ex)
                 {
                     res.Code = WebResponse.ResponseCode.error;
                     res.Message = new WebResponse.ResponseMessage
@@ -59,7 +58,7 @@ namespace Order_Management_WebService.Controllers
                         Body = $"There is an error."
                     };
                 }
-
+      
                 return res;
             });
         }

@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Order_Management_WebService.BusinessLayer.Models
 {
-    public class B_Ordenes : IInsert<E_Ordenes>, IDelete<E_Ordenes>, IUpdate<E_Ordenes>
+    public class B_Ordenes :  IDelete<E_Ordenes>
     {
         private D_Ordenes _context;
 
@@ -16,35 +16,35 @@ namespace Order_Management_WebService.BusinessLayer.Models
         {
             _context = new D_Ordenes();
         }
-        public E_Ordenes Add(E_Ordenes data)
+        public void Add(E_Ordenes data)
         {
-            var orden = _context.Add(data);
-            return orden;
+            _context.Add(data);
+        
         }
 
         public bool DeleteById(int id)
         {
-           
-            var result = _context.DeleteById(id);
-            return result;
+            try
+            {
+                _context.DeleteById(id);
+                return true;
 
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public List<OrdenesDtoModel> GetAll()
         {
-            var ordenes = _context.GetByModel().ToList();
+            var ordenes = _context.GetAll();
             return ordenes;
-        }
-
-        public void Update(E_Ordenes data)
-        {
-           _context.Update(data); ;
-          
         }
 
         public OrdenesDtoModel GetById(int id)
         {
-            var orden = _context.GetByModelById(id).FirstOrDefault();
+            var orden = _context.GetById(id);
             return orden;
         }
     }

@@ -1,64 +1,133 @@
-﻿using Order_Management_WebService.EntityLayer;
+﻿using Order_Management_WebService.DataLayer.DataAccess;
+using Order_Management_WebService.EntityLayer;
 using Order_Management_WebService.Models.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 
 namespace Order_Management_WebService.DataLayer.DbModels
 {
-    public class D_Empleados : ISelect<E_Empleados>, IInsert<E_Empleados>, IDelete<E_Empleados>, IUpdate<E_Empleados>
+    public class D_Empleados: D_Base, ISelect<E_Empleados>, IUpdate<E_Empleados>
     {
-        private Order_Management_Context _dbContext;
+        SqlConnection _connection;
+        DatabaseAccess _connectionString;
 
         public D_Empleados()
         {
-            _dbContext = new Order_Management_Context();
+            _connectionString = new DatabaseAccess();
+            _connection = new SqlConnection(_connectionString.ConnectionString);
         }
-        public E_Empleados Add(E_Empleados data)
+        public void Add(E_Empleados item)
         {
-            var empleado = _dbContext.Empleados.Add(data);
-            _dbContext.SaveChanges();
-            return empleado;
+            SqlCommand command = new SqlCommand($"insert into TBL_EMPLEADOS(NOMBRE, DIRECCION, TELEFONO, EMAIL) values(@nombre,@direccion,@telefono, @email)", _connection);
+
+            _connection.Open();
+
+            command.Parameters.AddWithValue("@nombre", item.Nombre);
+            command.Parameters.AddWithValue("@direccion", item.Direccion);
+            command.Parameters.AddWithValue("@telefono", item.Telefono);
+            command.Parameters.AddWithValue("@email", item.Email);
+            _connectionString.executeDml(command);
+
+            _connection.Close();
+
         }
 
-        public bool DeleteById(int id)
+        public void DeleteById(int id)
         {
-            try
-            {
-                var empleado = GetById(id);
-                _dbContext.Empleados.Remove(empleado);
-                _dbContext.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            SqlCommand command = new SqlCommand($"delete TBL_EMPLEADOS where IDEMPLEADO = @id ", _connection);
+
+            _connection.Open();
+            command.Parameters.AddWithValue("@id", id);
+
+            _connectionString.executeDml(command);
+
+            _connection.Close();
         }
 
         public List<E_Empleados> GetAll()
         {
-            var empleados = _dbContext.Empleados.ToList();
+            List<E_Empleados> Result = new List<E_Empleados>();
 
-            return empleados;
+            string query = $"select * from TBL_EMPLEADOS";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
+            {
+
+                Result.Add(new E_Empleados
+                {
+                    IdEmpleado = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDEMPLEADO"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Nombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("NOMBRE"))),
+                    Direccion = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("DIRECCION"))),
+                    Telefono = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("TELEFONO"))),
+                    Email = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("EMAIL"))),
+                });
+
+            }
+            _connection.Close();
+
+            return Result;
         }
 
-        public void Update(E_Empleados data)
+        public void Update(E_Empleados item)
         {
-            var empleado = GetById(data.IdEmpleado);
-            empleado.Nombre = data.Nombre;
-            empleado.Direccion = data.Direccion;
-            empleado.Email = data.Email;
-            empleado.Telefono = data.Telefono;
-            _dbContext.SaveChanges();
+            SqlCommand command = new SqlCommand($"update TBL_EMPLEADOS set NOMBRE = @nombre, DIRECCION = @direccion, TELEFONO = @telefono, EMAIL = @email where IDEMPLEADO = @id", _connection);
+
+            _connection.Open();
+
+            command.Parameters.AddWithValue("@id", item.IdEmpleado);
+            command.Parameters.AddWithValue("@nombre", item.Nombre);
+            command.Parameters.AddWithValue("@direccion", item.Direccion);
+            command.Parameters.AddWithValue("@telefono", item.Telefono);
+            command.Parameters.AddWithValue("@email", item.Email);
+            _connectionString.executeDml(command);
+
+            _connection.Close();
         }
 
         public E_Empleados GetById(int id)
         {
-            var empleado = _dbContext.Empleados.Find(id);
+            var Result = new E_Empleados();
 
-            return empleado;
+            string query = $"select * from TBL_EMPLEADOS where IDEMPLEADO={id}";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
+            {
+
+                Result = new E_Empleados
+                {
+                    IdEmpleado = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDEMPLEADO"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Nombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("NOMBRE"))),
+                    Direccion = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("DIRECCION"))),
+                    Telefono = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("TELEFONO"))),
+                    Email = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("EMAIL"))),
+                };
+
+            }
+            _connection.Close();
+
+            return Result;
         }
     }
 }

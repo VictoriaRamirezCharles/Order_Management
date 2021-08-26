@@ -22,10 +22,7 @@ namespace Order_Management_WebService
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
 
-            DatabaseAccess dataAccess = new DatabaseAccess();
-            dataAccess.LoadConnection();
-            Order_Management_Context Context = new Order_Management_Context();
-            Context.Database.Initialize(false);
+            
         }
     }
 }

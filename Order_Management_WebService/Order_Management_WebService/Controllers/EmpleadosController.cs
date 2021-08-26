@@ -39,10 +39,10 @@ namespace Order_Management_WebService.Controllers
         {
             return Response((WebResponse res) =>
             {
-                var response = _Business.Empleados.Add(model);
 
-                if (response != null)
+                try
                 {
+                    _Business.Empleados.Add(model);
                     res.Code = WebResponse.ResponseCode.success;
                     res.Message = new WebResponse.ResponseMessage
                     {
@@ -50,7 +50,7 @@ namespace Order_Management_WebService.Controllers
                         Body = "The employee has been added successfully."
                     };
                 }
-                else
+                catch (Exception ex)
                 {
                     res.Code = WebResponse.ResponseCode.error;
                     res.Message = new WebResponse.ResponseMessage
@@ -109,7 +109,7 @@ namespace Order_Management_WebService.Controllers
                     res.Message = new WebResponse.ResponseMessage
                     {
                         Title = "Success",
-                        Body = "The employee has been Updated successfully."
+                        Body = "The employee has been deleted successfully."
                     };
                 }
                 else

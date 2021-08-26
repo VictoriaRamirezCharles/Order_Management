@@ -28,6 +28,7 @@ namespace Order_Management_WebService.Controllers
                         Title = "Success",
                         Body = "Success"
                     };
+                    res.Data = data;
                 }
                 else
                 {
@@ -58,6 +59,7 @@ namespace Order_Management_WebService.Controllers
                         Title = "Success",
                         Body = "Success"
                     };
+                    res.Data = data;
                 }
                 else
                 {
@@ -78,19 +80,17 @@ namespace Order_Management_WebService.Controllers
         {
             return Response((WebResponse res) =>
             {
-                var response = _Business.Productos.Add(model);
-
-                if (response != null)
+                try
                 {
+                    _Business.Productos.Add(model);
                     res.Code = WebResponse.ResponseCode.success;
                     res.Message = new WebResponse.ResponseMessage
                     {
                         Title = "Success",
                         Body = "The product has been added successfully."
                     };
-                    res.Data = response;
                 }
-                else
+                catch(Exception ex)
                 {
                     res.Code = WebResponse.ResponseCode.error;
                     res.Message = new WebResponse.ResponseMessage
@@ -99,7 +99,7 @@ namespace Order_Management_WebService.Controllers
                         Body = $"There is an error."
                     };
                 }
-
+                
                 return res;
             });
         }

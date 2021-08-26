@@ -1,67 +1,137 @@
-﻿using Order_Management_WebService.EntityLayer;
+﻿using Order_Management_WebService.DataLayer.DataAccess;
+using Order_Management_WebService.EntityLayer;
 using Order_Management_WebService.Models.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 
 namespace Order_Management_WebService.DataLayer.DbModels
 {
-    public class D_Productos : ISelect<E_Productos>, IInsert<E_Productos>, IDelete<E_Productos>, IUpdate<E_Productos>
+    public class D_Productos : D_Base, ISelect<E_Productos>, IUpdate<E_Productos>
     {
-        private Order_Management_Context _dbContext;
+        SqlConnection _connection;
+        DatabaseAccess _connectionString;
 
         public D_Productos()
         {
-            _dbContext = new Order_Management_Context();
+            _connectionString = new DatabaseAccess();
+            _connection = new SqlConnection(_connectionString.ConnectionString);
         }
-        public E_Productos Add(E_Productos data)
+        public void Add(E_Productos item)
         {
-        
-            var producto = _dbContext.Productos.Add(data);
-            _dbContext.SaveChanges();
-            return producto;
+            SqlCommand command = new SqlCommand($"insert into TBL_PRODUCTOS(NOMBRE, DESCRIPCION, PRECIO, CANTIDAD) values(@nombre,@descripcion,@Precio, @Cantidad)", _connection);
+
+            _connection.Open();
+
+            command.Parameters.AddWithValue("@nombre", item.Nombre);
+            command.Parameters.AddWithValue("@descripcion", item.Descripcion);
+            command.Parameters.AddWithValue("@Precio", item.Precio);
+            command.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+            _connectionString.executeDml(command);
+
+            _connection.Close();
         }
 
-        public bool DeleteById(int id)
+        public void DeleteById(int id)
         {
-            try
-            {
-                var producto = GetById(id);
-                _dbContext.Productos.Remove(producto);
-                _dbContext.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            SqlCommand command = new SqlCommand($"delete TBL_PRODUCTOS where IDPRODUCTO = @id ", _connection);
+
+            _connection.Open();
+            command.Parameters.AddWithValue("@id", id);
+
+            _connectionString.executeDml(command);
+
+            _connection.Close();
 
 
         }
 
         public List<E_Productos> GetAll()
         {
-            var productos = _dbContext.Productos.ToList();
+            List<E_Productos> Result = new List<E_Productos>();
 
-            return productos;
+            string query = $"select * from TBL_PRODUCTOS";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
+            {
+
+                Result.Add(new E_Productos
+                {
+                    IdProducto = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDPRODUCTO"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Nombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("NOMBRE"))),
+                    Descripcion = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("DESCRIPCION"))),
+                    Cantidad = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("CANTIDAD"))),
+                    Precio = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("PRECIO")))
+
+                });
+
+            }
+            _connection.Close();
+
+            return Result;
         }
+    
 
-        public void Update(E_Productos data)
+        public void Update(E_Productos item)
         {
-            var producto = GetById(data.IdProducto);
-            producto.Nombre = data.Nombre;
-            producto.Precio = data.Precio;
-            producto.Descripcion = data.Descripcion;
-            producto.Cantidad = data.Cantidad;
-            _dbContext.SaveChanges();
-        }
+        SqlCommand command = new SqlCommand($"UPDATE TBL_PRODUCTOS SET NOMBRE = @nombre, DESCRIPCION = @descripcion, PRECIO = @precio, CANTIDAD = @cantidad WHERE IDPRODUCTO = @id", _connection);
+
+        _connection.Open();
+
+        command.Parameters.AddWithValue("@id", item.IdProducto);
+        command.Parameters.AddWithValue("@nombre", item.Nombre);
+        command.Parameters.AddWithValue("@descripcion", item.Descripcion);
+        command.Parameters.AddWithValue("@Precio", item.Precio);
+        command.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+        _connectionString.executeDml(command);
+
+        _connection.Close();
+    }
 
         public E_Productos GetById(int id)
         {
-            var orden = _dbContext.Productos.Find(id);
+            var Result = new E_Productos();
 
-            return orden;
+            string query = $"select * from TBL_PRODUCTOS where IDPRODUCTO = {id}";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
+            {
+
+                Result = new E_Productos
+                {
+                    IdProducto = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDPRODUCTO"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Nombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("NOMBRE"))),
+                    Descripcion = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("DESCRIPCION"))),
+                    Cantidad = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("CANTIDAD"))),
+                    Precio = GetValueManageNull<decimal>(Data.GetValue(Data.GetOrdinal("PRECIO")))
+
+                };
+
+            }
+            _connection.Close();
+
+            return Result;
         }
     }
 }

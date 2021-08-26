@@ -1,133 +1,127 @@
-﻿using Order_Management_WebService.EntityLayer;
+﻿using Order_Management_WebService.DataLayer.DataAccess;
+using Order_Management_WebService.EntityLayer;
 using Order_Management_WebService.Models.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 
 namespace Order_Management_WebService.DataLayer.DbModels
 {
-    public class D_Ordenes : ISelect<E_Ordenes>, IInsert<E_Ordenes>, IDelete<E_Ordenes>, IUpdate<E_Ordenes>
+    public class D_Ordenes : D_Base
     {
-        private Order_Management_Context _dbContext;
+        SqlConnection _connection;
+        DatabaseAccess _connectionString;
 
         public D_Ordenes()
         {
-            _dbContext = new Order_Management_Context();
+            _connectionString = new DatabaseAccess();
+            _connection = new SqlConnection(_connectionString.ConnectionString);
         }
-        public E_Ordenes Add(E_Ordenes data)
+        public void Add(E_Ordenes item)
         {
-            var orden = _dbContext.Ordenes.Add(data);
-            _dbContext.SaveChanges();
-            return orden;
+            SqlCommand command = new SqlCommand($"insert into TBL_ORDENES(FECHAORDEN) values(@fecha)", _connection);
+
+            _connection.Open();
+
+            command.Parameters.AddWithValue("@fecha", item.Fecha);
+            _connectionString.executeDml(command);
+
+            _connection.Close();
         }
 
-        public bool DeleteById(int id)
+        public void DeleteById(int id)
         {
-            try
+            SqlCommand command = new SqlCommand($"delete TBL_ORDENES where IDORDEN = @id ", _connection);
+
+            _connection.Open();
+            command.Parameters.AddWithValue("@id", id);
+
+            _connectionString.executeDml(command);
+
+            _connection.Close();
+
+        }
+
+        public List<OrdenesDtoModel> GetAll()
+        {
+            List<OrdenesDtoModel> Result = new List<OrdenesDtoModel>();
+
+            string query = $@"select o.IDORDEN, o.CODIGO,o.FECHAORDEN, od.IDPRODUCTO as ProductoId, od.PRECIO, od.CANTIDAD, p.Nombre from TBL_ORDENES o inner join TBL_ORDENES_DETALLE od on o.IDORDEN = od.IDORDEN
+              inner join TBL_PRODUCTOS p on od.IDPRODUCTO = p.IDPRODUCTO
+                            ";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
             {
-                var orden = GetById(id);
-                _dbContext.Ordenes.Remove(orden);
-                _dbContext.SaveChanges();
-                return true;
+
+                Result.Add(new OrdenesDtoModel
+                {
+                    IdOrden = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDORDEN"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Fecha = GetValueManageNull<DateTime>(Data.GetValue(Data.GetOrdinal("FECHAORDEN"))),
+                    Precio = GetValueManageNull<decimal>(Data.GetValue(Data.GetOrdinal("PRECIO"))),
+                    Cantidad = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("CANTIDAD"))),
+                    ProductoNombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("Nombre"))),
+                    IdProducto = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("ProductoId"))),
+                });
+
             }
-            catch (Exception ex)
+            _connection.Close();
+
+            return Result;
+        }
+
+      
+
+        public OrdenesDtoModel GetById(int id)
+        {
+            var  Result = new OrdenesDtoModel();
+
+            string query = $@"select o.IDORDEN, o.CODIGO,o.FECHAORDEN, od.IDPRODUCTO as ProductoId, od.PRECIO, od.CANTIDAD, p.Nombre from TBL_ORDENES o inner join TBL_ORDENES_DETALLE od on o.IDORDEN = od.IDORDEN
+              inner join TBL_PRODUCTOS p on od.IDPRODUCTO = p.IDPRODUCTO where o.IDORDEN = {id}
+                            ";
+
+            SqlCommand Command = new SqlCommand(query, _connection);
+
+            Command.CommandTimeout = Convert.ToInt32(WebConfigurationManager.AppSettings["SQLTimeOut"]);
+
+            _connection.Open();
+
+            var Data = Command.ExecuteReader();
+
+            while (Data.Read())
             {
-                return false;
+
+                Result = new OrdenesDtoModel
+                {
+                    IdOrden = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("IDORDEN"))),
+                    Codigo = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("CODIGO"))),
+                    Fecha = GetValueManageNull<DateTime>(Data.GetValue(Data.GetOrdinal("FECHAORDEN"))),
+                    Precio = GetValueManageNull<decimal>(Data.GetValue(Data.GetOrdinal("PRECIO"))),
+                    Cantidad = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("CANTIDAD"))),
+                    ProductoNombre = GetValueManageNull<string>(Data.GetValue(Data.GetOrdinal("Nombre"))),
+                    IdProducto = GetValueManageNull<int>(Data.GetValue(Data.GetOrdinal("ProductoId"))),
+                };
+
             }
+            _connection.Close();
 
-
+            return Result;
         }
 
-        public List<E_Ordenes> GetAll()
-        {
-            var ordenes = _dbContext.Ordenes.ToList();
+       
 
-            return ordenes;
-        }
-
-        public void Update(E_Ordenes data)
-        {
-            var orden = GetById(data.IdOrden);
-            orden.Fecha = data.Fecha;
-            _dbContext.SaveChanges();
-        }
-
-        public E_Ordenes GetById(int id)
-        {
-            var orden = _dbContext.Ordenes.Find(id);
-
-            return orden;
-        }
-
-        public IOrderedQueryable<OrdenesDtoModel> GetByModel()
-        {
-            
-            var result = (from o in _dbContext.Ordenes
-                          join od in _dbContext.Ordenes_Detalle on o.IdOrden equals od.IdOrden
-                          join p in _dbContext.Productos on od.IdProducto equals p.IdProducto
-                          select new
-                          {
-                              Id = o.IdOrden,
-                              Fecha = o.Fecha,
-                              Precio = od.Precio,
-                              Cantidad = od.Cantidad,
-                              IdProducto = od.IdProducto,
-                              ProductoNombre = p.Nombre,
-                              
-                          });
-
-
-            var listOrdenes = result.Select(x => new OrdenesDtoModel
-            {
-                IdOrden = x.Id,
-                Fecha = x.Fecha,
-                Precio = x.Precio,
-                Cantidad = x.Cantidad,
-                IdProducto = x.IdProducto,
-                ProductoNombre = x.ProductoNombre
-            }
-            ).OrderBy(x => x.IdOrden);
-
-
-            return listOrdenes;
-
-        }
-
-        public IOrderedQueryable<OrdenesDtoModel> GetByModelById(int id)
-        {
-
-            var result = (from o in _dbContext.Ordenes
-                          join od in _dbContext.Ordenes_Detalle on o.IdOrden equals od.IdOrden
-                          join p in _dbContext.Productos on od.IdProducto equals p.IdProducto
-                          where o.IdOrden == id
-                          select new
-                          {
-                              Id = o.IdOrden,
-                              Fecha = o.Fecha,
-                              Precio = od.Precio,
-                              Cantidad = od.Cantidad,
-                              IdProducto = od.IdProducto,
-                              ProductoNombre = p.Nombre,
-
-                          });
-
-
-            var listOrdenes = result.Select(x => new OrdenesDtoModel
-            {
-                IdOrden = x.Id,
-                Fecha = x.Fecha,
-                Precio = x.Precio,
-                Cantidad = x.Cantidad,
-                IdProducto = x.IdProducto,
-                ProductoNombre = x.ProductoNombre
-            }
-            ).OrderBy(x => x.IdOrden);
-
-
-            return listOrdenes;
-
-        }
+      
     }
 
     public class OrdenesDtoModel
