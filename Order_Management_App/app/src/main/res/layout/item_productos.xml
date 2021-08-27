@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+android:paddingTop="5dp"
+android:paddingBottom="5dp"
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="70dp">
+<LinearLayout
+    android:orientation="horizontal"
+    android:weightSum="12"
+    android:background="#F5F5F5"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/producto_lista_nombre"
+        android:textColor="#000"
+        android:layout_marginLeft="30dp"
+        android:layout_weight="9"
+        android:layout_width="0dp"
+        android:gravity="center|left"
+        android:text="Jabón Palmolive"
+        android:layout_height="match_parent"></TextView>
+
+    <TextView
+        android:id="@+id/producto_lista_cantidad"
+        android:textColor="#000"
+        android:layout_marginLeft="30dp"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:gravity="center|left"
+        android:text="30"
+        android:layout_height="match_parent"></TextView>
+
+    <ImageView
+        android:id="@+id/producto_delete"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="29"
+        android:textSize="20dp"
+        android:textColor="#000"
+        android:src="@drawable/ic_baseline_delete_24"
+        android:layout_height="match_parent"></ImageView>
+</LinearLayout>
+
+</LinearLayout>

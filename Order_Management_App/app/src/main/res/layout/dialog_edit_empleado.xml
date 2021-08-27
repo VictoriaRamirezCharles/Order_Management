@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:padding="15dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/codigo_empleado"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_size_normal"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"
+        android:text="@string/editar_empleado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></TextView>
+
+
+
+    <EditText
+        android:inputType="textMultiLine"
+        android:id="@+id/ed_nombre_empleado"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/font_size_normal"
+        android:gravity="center"
+        android:hint="@string/nombre_empleado"
+        android:background="@drawable/edit_text_border"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+
+    <EditText
+        android:inputType="textMultiLine"
+        android:id="@+id/ed_direccion_empleado"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/font_size_normal"
+        android:gravity="center"
+        android:hint="@string/direccion_empleado"
+        android:background="@drawable/edit_text_border"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <EditText
+        android:inputType="textMultiLine"
+        android:id="@+id/ed_telefono_empleado"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/font_size_normal"
+        android:gravity="center"
+        android:hint="@string/telefono_empleado"
+        android:background="@drawable/edit_text_border"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <EditText
+        android:inputType="textMultiLine"
+        android:id="@+id/email_empleado"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/font_size_normal"
+        android:gravity="center"
+        android:hint="@string/email_empleado"
+        android:background="@drawable/edit_text_border"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <Button
+        android:id="@+id/btn_edit_empleado_data"
+        android:textSize="@dimen/font_size_normal"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:text="@string/editar_empleado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></Button>
+
+
+</LinearLayout>
